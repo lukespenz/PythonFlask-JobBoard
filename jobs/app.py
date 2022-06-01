@@ -9,11 +9,11 @@ def open_connection():
     connection = getattr(g, '_connection', None)
     if connection == None:
         connection = g._connection = sqlite3.connect(PATH)
-    connection.row_factory = squlite3.Row
+    connection.row_factory = sqlite3.Row
     return connection
 
 
-def execute_squl(sql, values=(), commit=False, single=False):
+def execute_sql(sql, values=(), commit=False, single=False):
     connection = open_connection()
     cursor = connection.execute(sql, values)
     if commit == True:
