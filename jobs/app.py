@@ -1,29 +1,26 @@
-from flask import Flask, render_template, g
 import sqlite3
+from flask import Flask, render_template, g
 
-
-app = Flask(__name__)
 PATH = 'db/jobs.sqlite'
-
-values = ()
-commit = False
-single = False
+app = Flask(__name__)
 
 
 def open_connection():
-    connection = getattr(g._connection)
+    connection = getattr(g, '_connection', None)
     if connection == None:
-        sqlite3.connect(PATH)
+        connection = g._connection = sqlite3.connect(PATH)
     return connection
 
 
-def execute_squl(sql, values, commit, single):
+def execute_squl(sql, values=(), commit=False, single=False):
     connection = open_connection()
-    cursor = execute(connectionsql, values)
+    cursor = connection.execute(sql, values)
     if commit == True:
         results = connection.commit()
     else:
         results = cursor.fetchone() if single else cursor.fetchall()
+
+    cursor.close()
     return results
 
 
@@ -31,7 +28,7 @@ def execute_squl(sql, values, commit, single):
 def close_connection(exception):
     connection = getattr(g, '_connection', None)
     if connection is not None:
-        close_connection()
+        connection.close()
 
 
 @app.route('/')
